@@ -18,4 +18,4 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
  - API Gateway, Lambda, DynamoDB, SNS, SQS, CloudFormation, Serverless Framework, Typescript
 
 Server app API Gateway address.\
-Open [https://e7grysx715.execute-api.ap-southeast-2.amazonaws.com/dev](https://e7grysx715.execute-api.ap-southeast-2.amazonaws.com/dev)
+[https://e7grysx715.execute-api.ap-southeast-2.amazonaws.com/dev](https://e7grysx715.execute-api.ap-southeast-2.amazonaws.com/dev)
