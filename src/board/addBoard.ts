@@ -4,6 +4,7 @@ import aws from 'aws-sdk'
 
 const sqs = new aws.SQS();
 
+// Create Type for SQS message
 interface MessageBodyInput {
   user_id: String
   board_name: String
@@ -11,6 +12,7 @@ interface MessageBodyInput {
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaResponse> => {
 
+    // error handling for null event body value
     if (!event.body) {
         return {
             headers: {
@@ -22,6 +24,8 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaRespon
       }
 
     const data = JSON.parse(event.body)
+
+    // Gettig a user info from header
     let user_id = event.headers.app_user_id;
 
     // create SQS message for Board
@@ -30,7 +34,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaRespon
       board_name: data.board_name
     }
 
-    
+    // create params for SQS message
     const params = {
         
         QueueUrl: `https://sqs.${process.env.region}.amazonaws.com/${process.env.accountId}/BoardQueue-dev`,
