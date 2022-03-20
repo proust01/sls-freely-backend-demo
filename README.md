@@ -9,7 +9,7 @@ Clon the project and you can run:
 ### `serverless offline`
 
 Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+[http://localhost:3000](http://localhost:3000) to test it from testing tools.
 
 
 ## Demo Server App is running on AWS Cloud
