@@ -24,6 +24,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaRespon
     const data = JSON.parse(event.body)
     let user_id = event.headers.app_user_id;
 
+    // create SQS message for Board
     const messageBody: MessageBodyInput = {
       user_id: user_id,
       board_name: data.board_name
@@ -37,7 +38,9 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaRespon
       }
     
 
+    // Send SQS message
     try {
+
     const metadata = await sqs.sendMessage(params).promise()
     return {
         headers: {

@@ -12,18 +12,22 @@ const tableName = process.env.USER_TABLE
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaResponse> => {
 
+    // Getting user id from header
     let user_id = event.headers.app_user_id;
 
+    // Create DynamoDB params
+    let params = {
+        TableName: tableName,
+        KeyConditionExpression: "user_id = :user_id",
+        ExpressionAttributeValues : {
+            ":user_id" : user_id
+        },
+        Limit: 1,
+    }
+
+    // Query data
     try {
 
-        let params = {
-            TableName: tableName,
-            KeyConditionExpression: "user_id = :user_id",
-            ExpressionAttributeValues : {
-                ":user_id" : user_id
-            },
-            Limit: 1,
-        }
     
         let data = await dynamodb.query(params).promise();
     

@@ -8,6 +8,7 @@ aws.config.update({ region: 'ap-southeast-2' })
 const dynamodb = new aws.DynamoDB.DocumentClient();
 const tableName = process.env.USER_TABLE
 
+// Type for DynamoDB item
 interface UserItem {
   user_id: String
   name: String
@@ -16,17 +17,19 @@ interface UserItem {
 
 
 export const handler = async (event: SNSEvent): Promise<LambdaResponse> => {
+
+  // Getting SNS Event
   const record: SNSEventRecord = event.Records[0];
-
   const message = JSON.parse(record.Sns.Message)
-  console.log(message)
 
+  // Create DynamoDB item
   const item: UserItem = {
     user_id: uuid(),
     name: message.name,
     email: message.email
   }
 
+  // Store Data
   try {
     let data = await dynamodb.put({
       TableName: tableName,

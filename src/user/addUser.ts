@@ -7,6 +7,7 @@ const sns = new aws.SNS({ region: 'ap-southeast-2' })
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaResponse> => {
 
+  // error handling for null event body value
     if (!event.body) {
         return {
             headers: {
@@ -19,12 +20,13 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaRespon
 
     const data = JSON.parse(event.body)
 
+    // Create params for SNS event
     const params = {
         Message: JSON.stringify(data),
         TopicArn: `arn:aws:sns:${process.env.region}:${process.env.accountId}:sns-user-event`
       }
     
-
+    // Send SNS message
     try {
     const metadata = await sns.publish(params).promise()
     return {

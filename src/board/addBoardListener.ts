@@ -8,6 +8,7 @@ aws.config.update({ region: 'ap-southeast-2' })
 const dynamodb = new aws.DynamoDB.DocumentClient();
 const tableName = process.env.BOARD_TABLE
 
+// Type for DynamoDB item
 interface BoardItem {
   board_id: String
   user_id: String
@@ -15,11 +16,13 @@ interface BoardItem {
 }
 
 export const handler = async (event: SQSEvent): Promise<LambdaResponse> => {
-  const record: SQSRecord = event.Records[0];
 
+  // Getting SQS message
+  const record: SQSRecord = event.Records[0];
   const message = JSON.parse(record.body)
   console.log(message)
 
+  // Create DynamoDB item
   const item: BoardItem = {
     board_id: uuid(),
     user_id: message.user_id,
@@ -27,6 +30,7 @@ export const handler = async (event: SQSEvent): Promise<LambdaResponse> => {
   }
   console.log(item)
 
+  // Store Data
   try {
     let data = await dynamodb.put({
       TableName: tableName,
