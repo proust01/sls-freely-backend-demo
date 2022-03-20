@@ -1,0 +1,209 @@
+service: sls-freely-backend-demo
+
+frameworkVersion: '3'
+
+plugins:
+    - serverless-plugin-typescript
+    - serverless-pseudo-parameters
+    - serverless-offline
+
+custom:
+  SNSUserEvent:
+    name: SNSUserEvent-${self:provider.stage}
+    arn: !Ref SNSUserEvent
+  SNSMessageEvent:
+    name: SNSMessageEvent-${self:provider.stage}
+    arn: !Ref SNSMessageEvent
+  BoardQueue:
+    name: BoardQueue-${self:provider.stage}
+    arn: !GetAtt BoardQueue.Arn
+    url: !Ref BoardQueue
+  UserTable:
+    name: UserTable
+  BoardTable:
+    name: BoardTable
+  MessageTable:
+    name: MessageTable
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: ap-southeast-2
+  memorySize: 128
+  timeout: 5
+  endpointType: regional
+  environment:
+    SNS_USER_EVENT_ARN: ${self:custom.SNSUserEvent.arn}
+    region: ${aws:region}
+    accountId: ${aws:accountId}
+    USER_TABLE: ${self:service}-${self:custom.UserTable.name}-${opt:stage, self:provider.stage}
+    BOARD_TABLE: ${self:service}-${self:custom.BoardTable.name}-${opt:stage, self:provider.stage}
+    MESSAGE_TABLE: ${self:service}-${self:custom.MessageTable.name}-${opt:stage, self:provider.stage}
+    BOARD_QUEUE_URL: ${self:custom.BoardQueue.url}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Resource: ${self:custom.SNSUserEvent.arn}
+      Action:
+        - SNS:Publish
+    - Effect: "Allow"
+      Resource: ${self:custom.SNSMessageEvent.arn}
+      Action:
+        - SNS:Publish
+    - Effect: "Allow"
+      Resource: ${self:custom.BoardQueue.arn}
+      Action:
+        - sqs:SendMessage
+    - Effect: Allow
+      Action: 
+        - dynamodb:Query
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.USER_TABLE}"
+    - Effect: Allow
+      Action: 
+        - dynamodb:Query
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.BOARD_TABLE}"
+    - Effect: Allow
+      Action: 
+        - dynamodb:Query
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.MESSAGE_TABLE}"
+
+
+functions:
+  addUser:
+    handler: src/user/addUser.handler
+    description: POST /user
+    events:
+      - http:
+          path: /user
+          method: post
+          cors: true
+
+  addUserListener:
+    handler: src/user/addUserListener.handler
+    dependsOn: SNSUserEvent
+    events:
+      - sns:
+          arn: !Ref SNSUserEvent
+          topicName: sns-user-event
+
+  getUser:
+    handler: src/user/getUser.handler
+    description: GET /user/n/{user_id}
+    events:
+      - http:
+          path: user
+          method: get
+          cors: true
+
+  addBoard:
+    handler: src/board/addBoard.handler
+    description: POST /board
+    events:
+      - http:
+          path: /board
+          method: post
+          cors: true
+
+  addBoardListener:
+    handler: src/board/addBoardListener.handler
+    dependsOn: BoardQueue
+    events:
+      - sqs:
+          arn: ${self:custom.BoardQueue.arn}
+          batchSize: 1
+
+  getBoards:
+    handler: src/board/getBoards.handler
+    description: GET /boards
+    events:
+      - http:
+          path: boards
+          method: get
+          cors: true
+
+  addMessage:
+    handler: src/message/addMessage.handler
+    description: POST /board/message
+    events:
+      - http:
+          path: /board/message
+          method: post
+          cors: true
+
+  addMessageListener:
+    handler: src/message/addMessageListener.handler
+    dependsOn: SNSMessageEvent
+    events:
+      - sns:
+          arn: !Ref SNSMessageEvent
+          topicName: sns-message-event
+
+
+resources:
+  Resources:
+    SNSUserEvent:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: ${self:custom.SNSUserEvent.name}
+        TopicName: sns-user-event
+
+    SNSMessageEvent:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: ${self:custom.SNSMessageEvent.name}
+        TopicName: sns-message-event
+
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USER_TABLE}
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    BoardTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.BOARD_TABLE}
+        AttributeDefinitions:
+          - AttributeName: board_id
+            AttributeType: S
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH
+          - AttributeName: board_id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    MessageTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.MESSAGE_TABLE}
+        AttributeDefinitions:
+          - AttributeName: board_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: board_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    BoardQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.BoardQueue.name}
+
