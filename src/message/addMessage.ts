@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
-const aws = require('aws-sdk')
+import aws from 'aws-sdk'
 aws.config.update({ region: 'ap-southeast-2' })
 const sns = new aws.SNS({ region: 'ap-southeast-2' })
 

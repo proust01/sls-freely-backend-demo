@@ -2,19 +2,19 @@
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
-const aws = require('aws-sdk')
+import aws from 'aws-sdk'
+import _ from 'underscore';
+
 aws.config.update({ region: 'ap-southeast-2' })
 
 const dynamodb = new aws.DynamoDB.DocumentClient();
 const tableName = process.env.USER_TABLE
-const _ = require('underscore')
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaResponse> => {
 
     let user_id = event.headers.app_user_id;
 
     try {
-
 
         let params = {
             TableName: tableName,
@@ -27,6 +27,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaRespon
     
         let data = await dynamodb.query(params).promise();
     
+        // validation for empty data
         if(!_.isEmpty(data.Items)) {
             
             return {

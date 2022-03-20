@@ -2,7 +2,7 @@
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
-const aws = require('aws-sdk')
+import aws from 'aws-sdk'
 aws.config.update({ region: 'ap-southeast-2' })
 
 const dynamodb = new aws.DynamoDB.DocumentClient();

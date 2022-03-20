@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
-const aws = require('aws-sdk')
+import aws from 'aws-sdk'
+
 const sqs = new aws.SQS();
 
 interface MessageBodyInput {

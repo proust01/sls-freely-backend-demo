@@ -1,11 +1,11 @@
 import { SNSEvent, SNSEventRecord } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
 
-const AWS = require('aws-sdk')
-const { uuid } = require('uuidv4');
-AWS.config.update({ region: 'ap-southeast-2' })
+import aws from 'aws-sdk'
+import { uuid } from 'uuidv4';
+aws.config.update({ region: 'ap-southeast-2' })
 
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const dynamodb = new aws.DynamoDB.DocumentClient();
 const tableName = process.env.MESSAGE_TABLE
 
 interface MessageItem {
