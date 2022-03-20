@@ -34,9 +34,9 @@ provider:
   timeout: 5
   endpointType: regional
   environment:
-    SNS_USER_EVENT_ARN: ${self:custom.SNSUserEvent.arn}
     region: ${aws:region}
     accountId: ${aws:accountId}
+    SNS_USER_EVENT_ARN: ${self:custom.SNSUserEvent.arn}
     USER_TABLE: ${self:service}-${self:custom.UserTable.name}-${opt:stage, self:provider.stage}
     BOARD_TABLE: ${self:service}-${self:custom.BoardTable.name}-${opt:stage, self:provider.stage}
     MESSAGE_TABLE: ${self:service}-${self:custom.MessageTable.name}-${opt:stage, self:provider.stage}

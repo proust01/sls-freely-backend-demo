@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
 const aws = require('aws-sdk')
-// aws.config.update({ region: 'ap-southeast-2' })
 const sqs = new aws.SQS();
 
 interface MessageBodyInput {
