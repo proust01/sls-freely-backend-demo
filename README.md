@@ -18,4 +18,4 @@ Runs the app in the development mode.\
  - API Gateway, Lambda, DynamoDB, SNS, SQS, CloudFormation, Serverless Framework, Typescript
 
 Server app API Gateway address.\
-[https://e7grysx715.execute-api.ap-southeast-2.amazonaws.com/dev](https://e7grysx715.execute-api.ap-southeast-2.amazonaws.com/dev)
+[AWS SERVERLESS LINK](https://e7grysx715.execute-api.ap-southeast-2.amazonaws.com/dev)
