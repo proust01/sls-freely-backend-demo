@@ -1,11 +1,11 @@
 import { SQSEvent, SQSRecord } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
-
-import aws from 'aws-sdk'
+import { config, DynamoDB } from 'aws-sdk';
 import { uuid } from 'uuidv4';
-aws.config.update({ region: 'ap-southeast-2' })
 
-const dynamodb = new aws.DynamoDB.DocumentClient();
+config.update({ region: 'ap-southeast-2' })
+
+const dynamodb = new DynamoDB.DocumentClient();
 const tableName = process.env.BOARD_TABLE
 
 // Type for DynamoDB item
@@ -32,11 +32,11 @@ export const handler = async (event: SQSEvent): Promise<LambdaResponse> => {
 
   // Store Data
   try {
+
     let data = await dynamodb.put({
       TableName: tableName,
       Item: item
     }).promise()
-
 
     return {
         headers: {

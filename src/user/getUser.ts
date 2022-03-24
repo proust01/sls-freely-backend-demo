@@ -2,12 +2,12 @@
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
-import aws from 'aws-sdk'
+import { config, DynamoDB } from 'aws-sdk';
 import _ from 'underscore';
 
-aws.config.update({ region: 'ap-southeast-2' })
+config.update({ region: 'ap-southeast-2' })
 
-const dynamodb = new aws.DynamoDB.DocumentClient();
+const dynamodb = new DynamoDB.DocumentClient();
 const tableName = process.env.USER_TABLE
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<LambdaResponse> => {

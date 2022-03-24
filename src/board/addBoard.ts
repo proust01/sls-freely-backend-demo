@@ -1,8 +1,8 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 import { LambdaResponse } from '../types/types';
-import aws from 'aws-sdk'
+import { SQS } from 'aws-sdk';
 
-const sqs = new aws.SQS();
+const sqs = new SQS();
 
 // Create Type for SQS message
 interface MessageBodyInput {
